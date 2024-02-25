@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: shopin_backend-postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_Name}
+      POSTGRES_USER: ${username}
+      POSTGRES_PASSWORD: ${password}
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  spring-boot-app:
+    container_name: shopin_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${username}
+      SPRING_DATASOURCE_PASSWORD: ${password}
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
